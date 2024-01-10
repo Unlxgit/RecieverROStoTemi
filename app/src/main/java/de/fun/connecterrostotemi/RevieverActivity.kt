@@ -4,14 +4,16 @@ import android.Manifest
 import android.content.Context
 import android.content.pm.PackageManager
 import android.media.MediaPlayer
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.util.Log
 import android.view.WindowManager
+import androidx.appcompat.app.AppCompatActivity
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.app.ActivityCompat
+import com.robotemi.sdk.Robot
+import com.robotemi.sdk.TtsRequest
 import de.`fun`.connecterrostotemi.databinding.ActivityRevieverBinding
 import org.json.JSONObject
 import java.io.IOException
@@ -20,6 +22,7 @@ import java.net.DatagramSocket
 import java.nio.ByteBuffer
 import kotlin.concurrent.thread
 import kotlin.math.abs
+
 
 class RevieverActivity : AppCompatActivity() {
 
@@ -34,17 +37,13 @@ class RevieverActivity : AppCompatActivity() {
     )
 
     fun unpackVec2(data: ByteArray): Pair<Float, Float> {
-        // Assuming vec2 is a pair of floats (2 * 4 bytes)
         val float1 = ByteArray(4)
         val float2 = ByteArray(4)
 
-        // Extract the bytes for the first float
         System.arraycopy(data, 0, float1, 0, 4)
 
-        // Extract the bytes for the second float
         System.arraycopy(data, 4, float2, 0, 4)
 
-        // Convert bytes to floats
         val value1 = ByteBuffer.wrap(float1).float
         val value2 = ByteBuffer.wrap(float2).float
 
@@ -58,11 +57,16 @@ class RevieverActivity : AppCompatActivity() {
         window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
         setContentView(binding.root)
 
+        val robot = Robot.getInstance()
+
         binding.btnAnswers.setOnClickListener {
+            var text = ""
             for (question in mapOfQuestionsAndAnswers.keys) {
                 Log.i("Hello", "Question: $question, Answer: ${mapOfQuestionsAndAnswers[question]}")
-                // say all questions and answers
+                text += "$question, ${mapOfQuestionsAndAnswers[question]}\n"
             }
+            val ttsRequest = TtsRequest.create(text, false)
+            robot.speak(ttsRequest)
         }
 
         if (!hasPermissions(this, *permissions)) {
@@ -76,7 +80,6 @@ class RevieverActivity : AppCompatActivity() {
         mediaPlayer.isLooping = true
         mediaPlayer.start()
 
-        //val robot = Robot.getInstance()
 
 
         thread {
@@ -114,7 +117,6 @@ class RevieverActivity : AppCompatActivity() {
                         } else {
                             y = 1.0f * factor
                         }
-                        //Log.i("Hello" , "x: ${vec2.first}, y: ${vec2.second}")
                     }
                 }
 
@@ -140,6 +142,8 @@ class RevieverActivity : AppCompatActivity() {
                             val question = jsonObject.getString("question")
                             val answer = jsonObject.getString("answer")
                             mapOfQuestionsAndAnswers[question] = answer
+                            binding.question.text = question
+                            binding.answer.text = answer
                         } catch (e: Exception) {
                             Log.e("Hello", "Error: $e")
                         }
@@ -158,12 +162,12 @@ class RevieverActivity : AppCompatActivity() {
                     Thread.sleep(100)
 
                     Handler(Looper.getMainLooper()).post {
-                        /*robot.skidJoy(
+                        robot.skidJoy(
                             y,
                             x,
                             false
                         )
-                         */
+
 
                         val layoutParams =
                             binding.stick.layoutParams as ConstraintLayout.LayoutParams
