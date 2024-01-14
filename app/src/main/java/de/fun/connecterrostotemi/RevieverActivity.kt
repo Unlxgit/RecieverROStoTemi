@@ -12,8 +12,8 @@ import android.view.WindowManager
 import androidx.appcompat.app.AppCompatActivity
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.app.ActivityCompat
-import com.robotemi.sdk.Robot
-import com.robotemi.sdk.TtsRequest
+//import com.robotemi.sdk.Robot
+//import com.robotemi.sdk.TtsRequest
 import de.`fun`.connecterrostotemi.databinding.ActivityRevieverBinding
 import org.json.JSONObject
 import java.io.IOException
@@ -57,7 +57,7 @@ class RevieverActivity : AppCompatActivity() {
         window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
         setContentView(binding.root)
 
-        val robot = Robot.getInstance()
+        //val robot = Robot.getInstance()
 
         binding.btnAnswers.setOnClickListener {
             var text = ""
@@ -65,8 +65,8 @@ class RevieverActivity : AppCompatActivity() {
                 Log.i("Hello", "Question: $question, Answer: ${mapOfQuestionsAndAnswers[question]}")
                 text += "$question, ${mapOfQuestionsAndAnswers[question]}\n"
             }
-            val ttsRequest = TtsRequest.create(text, false)
-            robot.speak(ttsRequest)
+            //val ttsRequest = TtsRequest.create(text, false)
+            //robot.speak(ttsRequest)
         }
 
         if (!hasPermissions(this, *permissions)) {
@@ -98,10 +98,10 @@ class RevieverActivity : AppCompatActivity() {
 
                         // Unpack the received data into a pair of floats (vec2)
                         val vec2 = unpackVec2(buffer)
-                        x = -vec2.first
+                        x = vec2.first
 
-
-                        val factor = if (vec2.second >= 0)
+                        y = vec2.second
+                        /*val factor = if (vec2.second >= 0)
                             1.0f
                         else
                             -1.0f
@@ -117,6 +117,8 @@ class RevieverActivity : AppCompatActivity() {
                         } else {
                             y = 1.0f * factor
                         }
+
+                         */
                     }
                 }
 
@@ -159,20 +161,23 @@ class RevieverActivity : AppCompatActivity() {
         thread {
             try {
                 while (true) {
-                    Thread.sleep(100)
+                    Thread.sleep(50)
 
                     Handler(Looper.getMainLooper()).post {
-                        robot.skidJoy(
-                            y,
+                        /*robot.skidJoy(
                             x,
+                            y,
                             false
                         )
+
+                         */
+
 
 
                         val layoutParams =
                             binding.stick.layoutParams as ConstraintLayout.LayoutParams
-                        layoutParams.horizontalBias = (x + 1) / 2
-                        layoutParams.verticalBias = (y + 1) / 2
+                        layoutParams.horizontalBias = (y + 1) / 2
+                        layoutParams.verticalBias = (x + 1) / 2
                         binding.stick.layoutParams = layoutParams
 
                     }
