@@ -3,7 +3,6 @@ package de.`fun`.connecterrostotemi
 import android.Manifest
 import android.content.Context
 import android.content.pm.PackageManager
-import android.media.MediaPlayer
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
@@ -64,20 +63,25 @@ class RevieverActivity : AppCompatActivity() {
                 Log.i("Hello", "Question: $question, Answer: ${mapOfQuestionsAndAnswers[question]}")
                 text += "$question, ${mapOfQuestionsAndAnswers[question]}\n"
             }
-            val ttsRequest = TtsRequest.create(text, false)
-            robot.speak(ttsRequest)
+            Handler(Looper.getMainLooper()).post {
+                robot.speak(
+                    TtsRequest.create(text)
+                )
+            }
+
         }
 
         if (!hasPermissions(this, *permissions)) {
             ActivityCompat.requestPermissions(this, permissions, 1)
         }
-
         var x = 0.0f
         var y = 0.0f
         Log.i(logTAG, "onCreate")
-        var mediaPlayer = MediaPlayer.create(this, R.raw.skeleton)
+        /*var mediaPlayer = MediaPlayer.create(this, R.raw.skeleton)
         mediaPlayer.isLooping = true
         mediaPlayer.start()
+
+         */
 
 
 
