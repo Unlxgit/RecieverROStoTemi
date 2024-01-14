@@ -12,8 +12,8 @@ import android.view.WindowManager
 import androidx.appcompat.app.AppCompatActivity
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.app.ActivityCompat
-//import com.robotemi.sdk.Robot
-//import com.robotemi.sdk.TtsRequest
+import com.robotemi.sdk.Robot
+import com.robotemi.sdk.TtsRequest
 import de.`fun`.connecterrostotemi.databinding.ActivityRevieverBinding
 import org.json.JSONObject
 import java.io.IOException
@@ -21,7 +21,6 @@ import java.net.DatagramPacket
 import java.net.DatagramSocket
 import java.nio.ByteBuffer
 import kotlin.concurrent.thread
-import kotlin.math.abs
 
 
 class RevieverActivity : AppCompatActivity() {
@@ -57,7 +56,7 @@ class RevieverActivity : AppCompatActivity() {
         window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
         setContentView(binding.root)
 
-        //val robot = Robot.getInstance()
+        val robot = Robot.getInstance()
 
         binding.btnAnswers.setOnClickListener {
             var text = ""
@@ -65,8 +64,8 @@ class RevieverActivity : AppCompatActivity() {
                 Log.i("Hello", "Question: $question, Answer: ${mapOfQuestionsAndAnswers[question]}")
                 text += "$question, ${mapOfQuestionsAndAnswers[question]}\n"
             }
-            //val ttsRequest = TtsRequest.create(text, false)
-            //robot.speak(ttsRequest)
+            val ttsRequest = TtsRequest.create(text, false)
+            robot.speak(ttsRequest)
         }
 
         if (!hasPermissions(this, *permissions)) {
@@ -101,24 +100,6 @@ class RevieverActivity : AppCompatActivity() {
                         x = vec2.first
 
                         y = vec2.second
-                        /*val factor = if (vec2.second >= 0)
-                            1.0f
-                        else
-                            -1.0f
-
-                        if (abs(vec2.second) < 0.2) {
-                            y = 0.0f
-                        } else if (abs(vec2.second) < 0.3) {
-                            y = 0.3f * factor
-                        } else if (abs(vec2.second) < 0.5) {
-                            y = 0.5f * factor
-                        } else if (abs(vec2.second) < 0.7) {
-                            y = 0.7f * factor
-                        } else {
-                            y = 1.0f * factor
-                        }
-
-                         */
                     }
                 }
 
@@ -164,13 +145,13 @@ class RevieverActivity : AppCompatActivity() {
                     Thread.sleep(50)
 
                     Handler(Looper.getMainLooper()).post {
-                        /*robot.skidJoy(
+                        robot.skidJoy(
                             x,
                             y,
                             false
                         )
 
-                         */
+
 
 
 
