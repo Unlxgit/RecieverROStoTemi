@@ -22,9 +22,7 @@ import java.nio.ByteBuffer
 import kotlin.concurrent.thread
 
 
-class RevieverActivity : AppCompatActivity() {
-
-    private val logTAG = RevieverActivity::class.simpleName
+class ReceiverActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityRevieverBinding
 
@@ -33,6 +31,9 @@ class RevieverActivity : AppCompatActivity() {
     private val permissions = arrayOf(
         Manifest.permission.INTERNET,
     )
+
+    var x = 0.0f
+    var y = 0.0f
 
     fun unpackVec2(data: ByteArray): Pair<Float, Float> {
         val float1 = ByteArray(4)
@@ -59,8 +60,8 @@ class RevieverActivity : AppCompatActivity() {
 
         binding.btnAnswers.setOnClickListener {
             var text = ""
+            Log.i("Saying Text", "Map: $mapOfQuestionsAndAnswers")
             for (question in mapOfQuestionsAndAnswers.keys) {
-                Log.i("Hello", "Question: $question, Answer: ${mapOfQuestionsAndAnswers[question]}")
                 text += "$question, ${mapOfQuestionsAndAnswers[question]}\n"
             }
             Handler(Looper.getMainLooper()).post {
@@ -74,35 +75,20 @@ class RevieverActivity : AppCompatActivity() {
         if (!hasPermissions(this, *permissions)) {
             ActivityCompat.requestPermissions(this, permissions, 1)
         }
-        var x = 0.0f
-        var y = 0.0f
-        Log.i(logTAG, "onCreate")
-        /*var mediaPlayer = MediaPlayer.create(this, R.raw.skeleton)
-        mediaPlayer.isLooping = true
-        mediaPlayer.start()
-
-         */
-
-
 
         thread {
             try {
                 val soc = DatagramSocket(12345)
-                Log.i("Reviecing Controls", "Socket created")
+                Log.i("Receiving Controls", "Socket created")
                 soc.use { socket ->
                     while (true) {
                         val buffer = ByteArray(8)
 
-                        // Datagram packet to receive data
                         val packet = DatagramPacket(buffer, buffer.size)
 
-                        // Receive data
                         socket.receive(packet)
-
-                        // Unpack the received data into a pair of floats (vec2)
                         val vec2 = unpackVec2(buffer)
                         x = vec2.first
-
                         y = vec2.second
                     }
                 }
@@ -132,7 +118,7 @@ class RevieverActivity : AppCompatActivity() {
                             binding.question.text = question
                             binding.answer.text = answer
                         } catch (e: Exception) {
-                            Log.e("Hello", "Error: $e")
+                            Log.e("Can't Parse Q & A", "Error: $e")
                         }
 
                     }
@@ -154,17 +140,12 @@ class RevieverActivity : AppCompatActivity() {
                             y,
                             false
                         )
-
-
-
-
-
+                        // Updating trajectory view
                         val layoutParams =
                             binding.stick.layoutParams as ConstraintLayout.LayoutParams
                         layoutParams.horizontalBias = (y + 1) / 2
                         layoutParams.verticalBias = (x + 1) / 2
                         binding.stick.layoutParams = layoutParams
-
                     }
                 }
 
@@ -173,6 +154,7 @@ class RevieverActivity : AppCompatActivity() {
             }
         }
     }
+
 
     private fun hasPermissions(context: Context?, vararg permissions: String): Boolean {
         for (permission in permissions) {
